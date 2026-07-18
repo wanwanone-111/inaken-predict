@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17231b">
+  <title>いなけんならどうする？</title>
+  <style>
+    :root{
+      --bg:#edf2ed; --card:#fff; --ink:#172019; --muted:#667169;
+      --accent:#2f6b46; --accent-soft:#dfeddf; --line:#d9e2da;
+      --good:#e6f5e9; --good-ink:#176137; --other:#f4f5f3;
+      --shadow:0 16px 42px rgba(30,55,37,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100svh; color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",
+      "Yu Gothic",Meiryo,sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%,#d8eadb 0,transparent 35%),
+        radial-gradient(circle at 100% 100%,#f3e8cf 0,transparent 32%),
+        var(--bg);
+    }
+    button{font:inherit}
+    .app{width:min(100%,700px);min-height:100svh;margin:auto;padding:22px 16px 44px;display:flex;align-items:center}
+    .card{width:100%;padding:clamp(22px,5vw,38px);background:rgba(255,255,255,.97);
+      border:1px solid rgba(255,255,255,.9);border-radius:27px;box-shadow:var(--shadow)}
+    .eyebrow{margin:0 0 10px;color:var(--accent);font-size:.76rem;font-weight:900;letter-spacing:.12em}
+    h1{margin:0;font-size:clamp(2.15rem,9vw,3.8rem);line-height:1.08;letter-spacing:-.055em}
+    .lead{margin:20px 0 0;line-height:1.85;color:#37443b}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 26px}
+    .chip{padding:8px 12px;border-radius:999px;background:var(--accent-soft);
+      color:var(--accent);font-size:.82rem;font-weight:850}
+    .primary,.secondary{width:100%;border:0;border-radius:15px;padding:15px 18px;
+      cursor:pointer;font-weight:850}
+    .primary{background:var(--accent);color:#fff;box-shadow:0 8px 18px rgba(47,107,70,.22)}
+    .secondary{margin-top:10px;background:#f0f3f0;color:var(--ink)}
+    .note{margin:17px 0 0;text-align:center;color:var(--muted);font-size:.76rem;line-height:1.65}
+    .topline{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.83rem;font-weight:850}
+    .bar{height:9px;margin:12px 0 27px;border-radius:999px;background:#e8ede9;overflow:hidden}
+    .bar div{height:100%;width:0;background:var(--accent);transition:width .25s}
+    .category{display:inline-block;margin-bottom:11px;padding:6px 10px;border-radius:999px;
+      background:#f0f4f0;color:var(--accent);font-size:.72rem;font-weight:850}
+    .scene{margin:0 0 7px;color:var(--muted);font-size:.82rem;font-weight:800}
+    .question{margin:0 0 22px;font-size:clamp(1.22rem,5vw,1.62rem);line-height:1.55;letter-spacing:-.02em}
+    .options{display:grid;gap:11px}
+    .option{position:relative;width:100%;min-height:60px;padding:14px 14px 14px 49px;
+      border:1px solid var(--line);border-radius:15px;background:#fff;color:var(--ink);
+      text-align:left;line-height:1.48;cursor:pointer;transition:.15s}
+    .option:hover:not(:disabled){border-color:#7da68a;background:#f8fbf8;transform:translateY(-1px)}
+    .option:disabled{cursor:default}
+    .letter{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:25px;height:25px;
+      display:grid;place-items:center;border-radius:8px;background:#edf2ee;font-size:.74rem;font-weight:900}
+    .option.best{background:var(--good);border-color:#8ac59a;color:var(--good-ink);font-weight:850}
+    .option.chosen:not(.best){background:var(--other);border-color:#aeb7b0}
+    .feedback{display:none;margin-top:18px;padding:16px;border-radius:15px;background:var(--accent-soft);
+      color:#28563a;line-height:1.72}
+    .feedback.show{display:block}
+    .feedback strong{display:block;margin-bottom:4px}
+    .next{display:none;margin-top:16px}.next.show{display:block}
+    .result{text-align:center}
+    .result-mark{width:94px;height:94px;margin:0 auto 18px;display:grid;place-items:center;
+      border-radius:50%;background:var(--accent-soft);font-size:2.75rem}
+    .result h2{margin:0;font-size:clamp(2rem,8vw,3.15rem);letter-spacing:-.045em}
+    .score{margin:10px 0 0;color:var(--accent);font-size:1.12rem;font-weight:900}
+    .comment{max-width:460px;margin:18px auto 25px;color:#3c4940;line-height:1.82}
+
+    .review-wrap{margin:26px 0 8px;text-align:left}
+    .review-title{margin:0 0 12px;font-size:1.05rem}
+    .review-list{display:grid;gap:12px}
+    .review-item{border:1px solid var(--line);border-radius:16px;padding:15px;background:#fbfcfb}
+    .review-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+    .review-number{font-size:.76rem;color:var(--muted);font-weight:850}
+    .review-badge{flex:none;padding:5px 9px;border-radius:999px;font-size:.72rem;font-weight:900}
+    .review-badge.ok{background:var(--good);color:var(--good-ink)}
+    .review-badge.ng{background:#fff0ed;color:#963b2c}
+    .review-question{margin:0 0 11px;line-height:1.55;font-weight:850}
+    .review-answer{margin:6px 0;font-size:.9rem;line-height:1.55}
+    .review-answer span{display:inline-block;min-width:7.2em;color:var(--muted);font-weight:800}
+    .review-answer.user-wrong{color:#963b2c}
+    .review-answer.best-answer{color:var(--good-ink);font-weight:800}
+    .review-reason{margin:11px 0 0;padding-top:11px;border-top:1px dashed var(--line);color:#536058;font-size:.86rem;line-height:1.65}
+
+    details{margin:23px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:left}
+    summary{padding:15px 2px;cursor:pointer;font-weight:850}
+    details p{margin:0 0 16px;color:var(--muted);font-size:.9rem;line-height:1.7}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+<main class="app">
+  <section class="card" id="start">
+    <p class="eyebrow">BEHAVIOR PREDICTION QUIZ</p>
+    <h1>いなけんなら<br>どうする？</h1>
+    <p class="lead">
+      過去のLINEに出てきた、いなけんの返し方・判断・ノリをもとに作った類題検定。<br>
+      架空の場面で、最も「いなけんらしい」行動を選べ。
+    </p>
+    <div class="chips">
+      <span class="chip">全10問</span><span class="chip">4択</span>
+      <span class="chip">約5分</span><span class="chip">予測編</span>
+    </div>
+    <button class="primary" id="startBtn">予測を始める</button>
+    <p class="note">これは本人の性格診断ではなく、仲間内で楽しむ過去ログ由来の推定クイズです。</p>
+  </section>
+
+  <section class="card" id="quiz" hidden>
+    <div class="topline"><span id="counter"></span><span id="scoreLive">一致 0</span></div>
+    <div class="bar"><div id="progress"></div></div>
+    <span class="category" id="category"></span>
+    <p class="scene">このとき、いなけんなら？</p>
+    <h2 class="question" id="question"></h2>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="primary next" id="nextBtn">次の場面へ</button>
+  </section>
+
+  <section class="card result" id="result" hidden>
+    <div class="result-mark" id="emoji">🧠</div>
+    <p class="eyebrow">INAKEN PREDICTION LEVEL</p>
+    <h2 id="rank"></h2>
+    <p class="score" id="finalScore"></p>
+    <p class="comment" id="comment"></p>
+    <button class="primary" id="shareBtn">結果を共有する</button>
+    <button class="secondary" id="retryBtn">もう一度予測する</button>
+
+    <section class="review-wrap">
+      <h3 class="review-title">回答を振り返る</h3>
+      <div class="review-list" id="reviewList"></div>
+    </section>
+
+    <details>
+      <summary>この検定の考え方</summary>
+      <p>
+        実際に存在しない場面を出題し、過去の会話で繰り返し見られた
+        「短いツッコミ」「現実的な確認」「独特な言い換え」「実用性重視」
+        などから、最も近い反応を推定しています。
+      </p>
+    </details>
+    <p class="note">現在の本人が必ず同じ行動を取るという意味ではありません。</p>
+  </section>
+</main>
+
+<script>
+const questions = [
+  {
+    category:"予定調整",
+    q:"大阪・三重・京都にいる3人で、飲みに行く場所がなかなか決まらない。",
+    options:[
+      "全員が来られるまで延期する",
+      "間を取れる場所を提案し、現実的なら即『あり』とする",
+      "一番遠い人の家に集合させる",
+      "オンライン飲みだけで満足する"
+    ],
+    answer:1,
+    explanation:"予定がバラバラなときは一度ツッコミつつ、奈良のような中間案には『それはありなんよ』と乗る傾向。"
+  },
+  {
+    category:"突発的な相談",
+    q:"友人が突然『昔使っていた弓を貸して』と言い出した。理由はまだ言わない。",
+    options:[
+      "まず用途を聞き、その後サイズなど実用面を確認する",
+      "何も聞かずすぐ郵送する",
+      "既読をつけず翌日まで待つ",
+      "自分も新しい弓を買う"
+    ],
+    answer:0,
+    explanation:"最初は強めの冗談で用途を疑い、真相が分かった後は『矢尺あうん？』と現実的な確認に移るのがいなけん型。"
+  },
+  {
+    category:"お金と現実",
+    q:"友人が『このレースに10万円入れたら億万長者になれる』と言っている。",
+    options:[
+      "ノリで全額乗る",
+      "『夢があるな』とだけ返す",
+      "笑いつつ、金額的に億万長者にはならないと冷静に返す",
+      "競馬そのものを説教してやめさせる"
+    ],
+    answer:2,
+    explanation:"ノリには参加するが、計算として無理な部分は『多分10マン突っ込んでも億万長者にはなれない』と現実へ戻す。"
+  },
+  {
+    category:"プレゼント",
+    q:"友人が『誕生日に高級海鮮セットを贈るわ』と言ってきた。",
+    options:[
+      "さらに高いものを指定する",
+      "実用的で安い食べ物を希望する",
+      "現金にしてくれと言う",
+      "何もいらないと完全に断る"
+    ],
+    answer:1,
+    explanation:"牡蠣を提案された場面で希望したのは、まさかのインスタント味噌汁。豪華さより実用とオチ。"
+  },
+  {
+    category:"誘いを断る",
+    q:"みんなで食事に行く日、自分はすでに映画の予定が入っている。",
+    options:[
+      "理由を言わず欠席する",
+      "映画をキャンセルして合流する",
+      "普通に『行けない』とだけ返す",
+      "独特な肩書きを付けて軽く断る"
+    ],
+    answer:3,
+    explanation:"実際の返しは『映画見に行くのでパス侍』。断るときにも一語オチを入れる。"
+  },
+  {
+    category:"ゲーム",
+    q:"友人がオンライン対戦に誘ってきたが、自分は別ゲームの発売日で忙しい。",
+    options:[
+      "無言でゲームを続ける",
+      "別ゲームで忙しいと宣言し、逆に友人へ真面目に遊べと説く",
+      "両方同時に起動する",
+      "ゲームをやめて仕事を始める"
+    ],
+    answer:1,
+    explanation:"『ポケモン捕まえるので忙しい』からの『真面目にやれよ！仕事じゃねぇんだぞ！』が基本形。"
+  },
+  {
+    category:"おすすめ布教",
+    q:"友人に大量のポップコーン豆を贈ったところ、量の多さに驚かれた。",
+    options:[
+      "謝って半分返送してもらう",
+      "量を隠して話題を変える",
+      "作り方と健康面を説明し、信者にしようとする",
+      "次はさらに2倍送るとだけ宣言する"
+    ],
+    answer:2,
+    explanation:"50人前と明かし、レンチンでヘルシーと説明し、最後は『これで君もポップコーン信者』まで持っていく。"
+  },
+  {
+    category:"気に入った場所",
+    q:"最近見つけたサウナがかなり良く、友人から『次は連れてって』と言われた。",
+    options:[
+      "丁寧に電車の乗換案内を送る",
+      "次回の日程候補を5つ送る",
+      "来る手段を雑に一言で指定する",
+      "会員登録してからと言う"
+    ],
+    answer:2,
+    explanation:"実際の締めは『ちゃりでこい』。気に入った場所の情報は話すが、最後は短い無茶振り。"
+  },
+  {
+    category:"買い物",
+    q:"欲しい家電があるが、値段が少し高い。友人も同じ家電を欲しがっている。",
+    options:[
+      "即購入して友人にも勧める",
+      "一度諦めつつ、友人が話を振ると『買ってくれるんか』と返す",
+      "価格を見ずローンを組む",
+      "中古品を黙って友人宅へ送る"
+    ],
+    answer:1,
+    explanation:"BRUNOを『ちょい高い』と諦めた後、友人の話にはすぐ『買ってくれるんか』と返している。"
+  },
+  {
+    category:"返事の温度",
+    q:"友人がかなり長い説明をしたが、内容はだいたい理解できた。",
+    options:[
+      "三段落の感想を返す",
+      "短い相づちで理解を示す",
+      "必ず電話をかけ直す",
+      "説明を最初からやり直させる"
+    ],
+    answer:1,
+    explanation:"『あーね』『そうそう』『つよ』『なるほろ』など、理解や評価を短く返す場面が多い。"
+  }
+];
+
+const ranks = [
+  {min:10,rank:"いなけん思考 同期済み",emoji:"👑",comment:"本人の返しが来る前に、ほぼ同じ文章を打てる領域です。"},
+  {min:8,rank:"いなけん予測 1級",emoji:"🏆",comment:"ノリと現実的な判断の切り替えまで、かなり読めています。"},
+  {min:6,rank:"いなけん予測 2級",emoji:"🥇",comment:"主要な行動パターンは理解済み。短い返しの解像度を上げれば1級です。"},
+  {min:4,rank:"いなけん予測 3級",emoji:"🥈",comment:"雰囲気はつかめていますが、実用性と一語オチを見落としがちです。"},
+  {min:0,rank:"いなけん予測 見習い",emoji:"🌱",comment:"まずは『あーね』『つよ』『ちゃりでこい』の使い分けから始めましょう。"}
+];
+
+let index=0, score=0, locked=false;
+let userAnswers=[];
+const $=id=>document.getElementById(id);
+
+$("startBtn").onclick=startQuiz;
+$("retryBtn").onclick=startQuiz;
+$("nextBtn").onclick=next;
+$("shareBtn").onclick=share;
+
+function startQuiz(){
+  index=0; score=0; locked=false; userAnswers=[];
+  $("start").hidden=true; $("result").hidden=true; $("quiz").hidden=false;
+  render(); scrollTo({top:0,behavior:"smooth"});
+}
+function render(){
+  locked=false;
+  const item=questions[index];
+  $("counter").textContent=`${index+1} / ${questions.length}`;
+  $("scoreLive").textContent=`一致 ${score}`;
+  $("progress").style.width=`${index/questions.length*100}%`;
+  $("category").textContent=item.category;
+  $("question").textContent=item.q;
+  $("feedback").className="feedback"; $("feedback").innerHTML="";
+  $("nextBtn").className="primary next";
+  $("nextBtn").textContent=index===questions.length-1?"判定を見る":"次の場面へ";
+  const letters=["A","B","C","D"], wrap=$("options");
+  wrap.innerHTML="";
+  item.options.forEach((text,i)=>{
+    const b=document.createElement("button");
+    b.className="option";
+    b.innerHTML=`<span class="letter">${letters[i]}</span><span>${escapeHtml(text)}</span>`;
+    b.onclick=()=>choose(i,b);
+    wrap.appendChild(b);
+  });
+}
+function choose(selected,button){
+  if(locked)return;
+  locked=true;
+  const item=questions[index], buttons=[...document.querySelectorAll(".option")];
+  userAnswers[index]=selected;
+  buttons.forEach((b,i)=>{b.disabled=true;if(i===item.answer)b.classList.add("best")});
+  button.classList.add("chosen");
+  if(selected===item.answer)score++;
+  $("scoreLive").textContent=`一致 ${score}`;
+  $("progress").style.width=`${(index+1)/questions.length*100}%`;
+  $("feedback").className="feedback show";
+  $("feedback").innerHTML=`<strong>${selected===item.answer?"いなけん予測、一致。":"最もいなけんらしいのはこちら。"}</strong>${escapeHtml(item.explanation)}`;
+  $("nextBtn").classList.add("show");
+}
+function next(){
+  if(!locked)return;
+  index++;
+  if(index>=questions.length)showResult();else{render();scrollTo({top:0,behavior:"smooth"})}
+}
+function showResult(){
+  $("quiz").hidden=true;$("result").hidden=false;
+  const r=ranks.find(x=>score>=x.min);
+  $("rank").textContent=r.rank;$("emoji").textContent=r.emoji;
+  $("finalScore").textContent=`10場面中 ${score}場面一致`;
+  $("comment").textContent=r.comment;
+  renderReview();
+  scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderReview(){
+  const wrap=$("reviewList");
+  wrap.innerHTML="";
+  questions.forEach((item,i)=>{
+    const selected=userAnswers[i];
+    const matched=selected===item.answer;
+    const card=document.createElement("article");
+    card.className="review-item";
+    card.innerHTML=`
+      <div class="review-head">
+        <span class="review-number">第${i+1}問・${escapeHtml(item.category)}</span>
+        <span class="review-badge ${matched?"ok":"ng"}">${matched?"一致":"不一致"}</span>
+      </div>
+      <p class="review-question">${escapeHtml(item.q)}</p>
+      <p class="review-answer ${matched?"":"user-wrong"}"><span>あなたの回答</span>${escapeHtml(item.options[selected] ?? "未回答")}</p>
+      <p class="review-answer best-answer"><span>いなけんらしい回答</span>${escapeHtml(item.options[item.answer])}</p>
+      <p class="review-reason">${escapeHtml(item.explanation)}</p>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+async function share(){
+  const r=ranks.find(x=>score>=x.min);
+  const text=`「いなけんならどうする？」検定\n10場面中${score}場面一致！\n判定：${r.rank}`;
+  if(navigator.share){try{await navigator.share({title:"いなけんならどうする？",text});return}catch(e){if(e.name==="AbortError")return}}
+  try{await navigator.clipboard.writeText(text);$("shareBtn").textContent="結果をコピーしました";setTimeout(()=>$("shareBtn").textContent="結果を共有する",1800)}
+  catch(e){alert(text)}
+}
+function escapeHtml(v){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+</script>
+</body>
+</html>
